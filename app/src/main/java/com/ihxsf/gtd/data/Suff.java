@@ -7,6 +7,7 @@ import java.util.Date;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
 import static java.lang.Math.pow;
@@ -17,29 +18,20 @@ import static java.lang.Math.sqrt;
  * Created by hxsf on 16－05－23.
  */
 public class Suff extends RealmObject {
+    @PrimaryKey
+    private int id;
     @Required
     private String title;
     private Date time;
     private Double latitude;
     private Double longitude;
     private int level;
-    private RealmList<Suff> childSuff;
+    private int project;
+    private String desc;
+    private String ezLocation;
+    private RealmList<Tag> tags;
     @Ignore
     private long rank;
-
-    public RealmList<Suff> getChildSuff() {
-        return childSuff;
-    }
-
-    public void addChildSuff(Suff childSuff) {
-        this.childSuff.add(childSuff);
-    }
-    public void removeChildSuff(Suff childSuff) {
-        this.childSuff.remove(childSuff);
-    }
-    public void removeChildSuff(int index) {
-        this.childSuff.remove(index);
-    }
 
     public Double getLatitude() {
         return latitude;
@@ -63,19 +55,60 @@ public class Suff extends RealmObject {
     public Suff() {
     }
 
-    public Suff(String title, Date time, Location local, int level) {
-        this.title = title;
-        this.time = time;
-        this.longitude = local.getLongitude();
-        this.latitude = local.getLatitude();
-        this.level = level;
+    public int getId() {
+        return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private long calcLocale(Location l) {
         return (long) sqrt(pow(l.getLatitude() - latitude, 2) + pow(l.getLongitude() - longitude, 2)) * 10;
     }
     public long calcRank(Location l) {
         rank = ((System.currentTimeMillis() - time.getTime()) / 1000 + calcLocale(l)) / level;
         return rank;
+    }
+
+    public String getEzLocation() {
+        return ezLocation;
+    }
+
+    public void setEzLocation(String ezLocation) {
+        this.ezLocation = ezLocation;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getProject() {
+        return project;
+    }
+
+    public void setProject(int project) {
+        this.project = project;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public RealmList<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(RealmList<Tag> tags) {
+        this.tags = tags;
     }
 
     public String getTitle() {
