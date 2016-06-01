@@ -1,11 +1,14 @@
 package com.ihxsf.gtd;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        testPermission();
         realm = Realm.getDefaultInstance();
         recyclerView = (RecyclerView) findViewById(R.id.suff_list);
         setUpRecyclerView();
@@ -60,6 +63,23 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void testPermission() {
+        PackageManager pm = this.getPackageManager();
+        PackageInfo pi;
+        try {
+            // 参数2必须是PackageManager.GET_PERMISSIONS
+            pi = pm.getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
+            String[] permissions = pi.requestedPermissions;
+            if(permissions != null){
+                for(String str : permissions){
+                    Log.i("permission", str);
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

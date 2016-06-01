@@ -33,12 +33,14 @@ public class LaunchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_launch);
 
         AsyncTask asyncTask = new AsyncTask() {
-            public Intent intent;
+            private Intent intent;
+            private Intent serverintent;
             public static final long LAUNCH_TIME = 1000;
 
             @Override
             protected void onPreExecute() {
                 intent = new Intent(LaunchActivity.this, MainActivity.class);
+                serverintent = new Intent(LaunchActivity.this, com.amap.api.location.APSService.class);
                 super.onPreExecute();
             }
             @Override
@@ -55,6 +57,7 @@ public class LaunchActivity extends AppCompatActivity {
                     while (!cango) {
                         Thread.sleep(LAUNCH_TIME);
                     }
+                    startService(serverintent);
                     ((GTDApplication)getApplication()).mLocationClient.startLocation();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
