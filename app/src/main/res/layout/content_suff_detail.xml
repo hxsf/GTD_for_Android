@@ -56,10 +56,8 @@
             android:layout_marginTop="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
+            <android.support.v7.widget.AppCompatMultiAutoCompleteTextView
                 android:id="@+id/tags"
-                android:editable="false"
-                android:inputType="none"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/tags"/>
