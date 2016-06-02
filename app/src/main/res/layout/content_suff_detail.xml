@@ -27,6 +27,7 @@
                 android:hint="@string/desc"/>
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
+            android:id="@+id/time_btn"
             android:layout_marginTop="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -39,6 +40,7 @@
                 android:hint="@string/datetime"/>
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
+            android:id="@+id/location_btn"
             android:layout_marginTop="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

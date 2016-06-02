@@ -2,20 +2,32 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'GTD'
+            keyPassword 'hxsf1011'
+            storeFile file('/Users/hxsf/workspace/Android/keys/GTD.jks')
+            storePassword 'hxsf1011'
+        }
+    }
     compileSdkVersion 23
     buildToolsVersion '23.0.3'
-
     defaultConfig {
         applicationId "com.ihxsf.gtd"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.config
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
     sourceSets {
@@ -23,8 +35,14 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+    productFlavors {
+    }
 }
-
+repositories {
+    flatDir {
+        dirs 'libs' //this way we can find the .aar file in libs folder
+    }
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
@@ -34,6 +52,9 @@ dependencies {
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
     compile 'com.wdullaer:materialdatetimepicker:2.3.0'
     compile 'com.github.kayvannj:PermissionUtils:1.0.2@aar'
-    compile files('libs/AMap_Location_V2.5.0_20160526.jar')
+    compile (name:'com.github.QuadFlask_colorpicker_0.0.10', ext:'aar')
+    compile('com.mikepenz:materialdrawer:5.2.8@aar') {
+        transitive = true
+    }
     compile files('libs/BaiduLBS_Android.jar')
 }

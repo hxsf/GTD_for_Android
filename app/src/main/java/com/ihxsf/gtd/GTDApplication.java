@@ -1,9 +1,10 @@
 package com.ihxsf.gtd;
 
 import android.app.Application;
+import android.location.Location;
 import android.util.Log;
 
-import com.yayandroid.locationmanager.LocationConfiguration;
+import com.baidu.location.BDLocation;
 
 import java.util.Date;
 
@@ -14,11 +15,9 @@ import io.realm.RealmConfiguration;
  * Created by hxsf on 16－05－25.
  */
 public class GTDApplication extends Application {
-    public LocationConfiguration locationConfiguration;
-    private double longitude;
-    private double latitude;
     private Date lastGetLocation;
     private String ezLocation;
+    private BDLocation location;
 
     @Override
     public void onCreate() {
@@ -29,13 +28,6 @@ public class GTDApplication extends Application {
         Log.i("realm", "set default");
     }
 
-    public LocationConfiguration getLocationConfiguration() {
-        return locationConfiguration;
-    }
-
-    public void setLocationConfiguration(LocationConfiguration locationConfiguration) {
-        this.locationConfiguration = locationConfiguration;
-    }
 
     public Date getLastGetLocation() {
         return lastGetLocation;
@@ -45,16 +37,24 @@ public class GTDApplication extends Application {
         return ezLocation;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public void setLastGetLocation(Date lastGetLocation) {
+        this.lastGetLocation = lastGetLocation;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public void setEzLocation(String ezLocation) {
+        this.ezLocation = ezLocation;
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
+    }
+
+    public BDLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(BDLocation location) {
+        this.location = location;
     }
 }

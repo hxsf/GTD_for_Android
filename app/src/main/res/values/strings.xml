@@ -12,4 +12,9 @@
     <string name="datetime">时间</string>
     <string name="location">地点</string>
     <string name="tags">标签</string>
+    <string name="inbox">Inbox</string>
+    <string name="next">Next</string>
+    <string name="watch">Watch</string>
+    <string name="future">Future</string>
+    <string name="tag_name">名字</string>
 </resources>

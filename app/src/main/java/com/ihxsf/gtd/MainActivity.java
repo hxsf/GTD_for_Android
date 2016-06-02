@@ -1,10 +1,18 @@
 package com.ihxsf.gtd;
 
+import android.annotation.TargetApi;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -18,32 +26,51 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.slider.LightnessSlider;
 import com.ihxsf.gtd.View.SuffDividerItemDecoration;
 import com.ihxsf.gtd.View.SuffDividerLine;
 import com.ihxsf.gtd.View.SuffItemTouchHelper;
 import com.ihxsf.gtd.View.SuffListAdapter;
+import com.ihxsf.gtd.data.Projects;
 import com.ihxsf.gtd.data.Suff;
+import com.ihxsf.gtd.data.Tag;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.BaseViewHolder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
     private Realm realm;
     private RecyclerView recyclerView;
     private OrderedRealmCollection<Suff> list;
+    private Drawer drawer;
+    private Toolbar toolbar;
+    private PrimaryDrawerItem tagsDrawerItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         testPermission();
         realm = Realm.getDefaultInstance();
         recyclerView = (RecyclerView) findViewById(R.id.suff_list);
         setUpRecyclerView();
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,14 +82,116 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        drawer = init_drawer(savedInstanceState);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.setDrawerListener(toggle);
+//        toggle.syncState();
+    }
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+    private Drawer init_drawer(Bundle savedInstanceState) {
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withCompactStyle(false)
+                .withHeaderBackground(R.drawable.side_nav_bar)
+                .withSavedInstance(savedInstanceState)
+                .build();
+        realm.beginTransaction();
+        RealmResults<Tag> tags = realm.where(Tag.class).findAll();
+        realm.commitTransaction();
+        List<IDrawerItem> tags_list= new ArrayList<>();
+
+        for (Tag tag : tags) {
+            tags_list.add(new SecondaryDrawerItem()
+                    .withName(tag.getName())
+                    .withIcon(R.drawable.ic_menu_item_cicle)
+                    .withIconColor((int) tag.getColor())
+                    .withSelectedIconColor((int) tag.getColor())
+                    .withLevel(2)
+                    .withIconTintingEnabled(true).withIdentifier(tag.getId()+10)
+            );
+        }
+        tagsDrawerItem = new PrimaryDrawerItem().withName("Tags").withIdentifier(0).withSubItems(tags_list).withIsExpanded(true).withSelectable(false);
+
+        return new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(headerResult)
+                .withTranslucentStatusBar(true)
+                .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Inbox").withIdentifier(1).withIcon(R.drawable.ic_menu_inbox),
+                        new PrimaryDrawerItem().withName("Next").withIdentifier(2).withIcon(R.drawable.ic_menu_next),
+                        new PrimaryDrawerItem().withName("Watch").withIdentifier(3).withIcon(R.drawable.ic_menu_watch),
+                        new PrimaryDrawerItem().withName("Futrue").withIdentifier(4).withIcon(R.drawable.ic_menu_future),
+                        tagsDrawerItem,
+                        new PrimaryDrawerItem().withName("Add New Tag").withIdentifier(10).withIcon(R.drawable.ic_add).withSelectable(false).withIconTintingEnabled(true).withIconColor(Color.parseColor("#000000"))
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        Log.i("Item", "postion="+position+" id="+drawerItem.getIdentifier());
+                        long id = drawerItem.getIdentifier();
+
+                        if (id == 10) {
+                            View dialogview = getLayoutInflater().inflate(R.layout.dialog_add_tag, null);
+                            final EditText tagname = (EditText) dialogview.findViewById(R.id.tag_name);
+                            final ColorPickerView colorPickerView = (ColorPickerView) dialogview.findViewById(R.id.color_picker_view);
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("Add A New Tag")
+                                    .setView(dialogview)
+                                    .setPositiveButton("Cancel", null)
+                                    .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    realm.beginTransaction();
+                                    Tag tag = new Tag();
+                                    int id = realm.where(Tag.class).max("id").intValue()+1;
+                                    tag.setId(id);
+                                    String name = tagname.getText().toString();
+                                    int color = colorPickerView.getSelectedColor();
+                                    if (realm.where(Tag.class).equalTo("name", name).count() > 0){
+                                        new AlertDialog.Builder(MainActivity.this).setTitle("Tag已存在").setPositiveButton("OK", null).show();
+                                        realm.cancelTransaction();
+                                    } else {
+                                        tag.setName(name);
+                                        tag.setColor(color);
+                                        tagsDrawerItem.getSubItems().add(
+                                                new SecondaryDrawerItem()
+                                                        .withName(name)
+                                                        .withIcon(R.drawable.ic_menu_item_cicle)
+                                                        .withIconColor(color)
+                                                        .withSelectedIconColor(color)
+                                                        .withLevel(2)
+                                                        .withIconTintingEnabled(true).withIdentifier(id+10)
+
+                                        );
+                                        realm.copyToRealmOrUpdate(tag);
+                                        drawer.getAdapter().notifyAdapterSubItemsChanged(drawer.getPosition(0));
+                                        realm.commitTransaction();
+                                    }
+                                }
+                            }).show();
+                        }else {
+                            if (id == 1) {
+                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).findAll();
+                            } else if (id == 2) {
+                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).findAll();
+                            } else if (id == 3) {
+                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).findAll();
+                            } else if (id == 4) {
+                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).findAll();
+                            } else if (id > 10) {
+                                list = realm.where(Suff.class).equalTo("tags.id", id-10).findAll();
+                            }
+                            recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
+                        }
+
+
+                        return false;
+                    }
+                })
+                .build();
     }
 
     private void testPermission() {
@@ -121,7 +250,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setUpRecyclerView() {
-        recyclerView.addItemDecoration(new SuffDividerLine(this, LinearLayoutManager.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         list = realm.where(Suff.class).findAllAsync();
         SuffListAdapter adapter = new SuffListAdapter(this, list);
@@ -135,13 +263,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void deleteItem(Suff item) {
-        final String title = item.getTitle();
+        final int id = item.getId();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realm.where(Suff.class).equalTo("title", title)
-                        .findAll()
-                        .deleteAllFromRealm();
+                realm.where(Suff.class).equalTo("id", id)
+                        .findFirst()
+                        .deleteFromRealm();
             }
         });
     }
@@ -150,29 +278,32 @@ public class MainActivity extends AppCompatActivity
         list.deleteFromRealm(postion);
         realm.commitTransaction();
     }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+//
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_camera) {
+//            // Handle the camera action
+//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).findAll();
+//        } else if (id == R.id.nav_gallery) {
+//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).findAll();
+//        } else if (id == R.id.nav_slideshow) {
+//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).findAll();
+//        } else if (id == R.id.nav_manage) {
+//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).findAll();
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
+//
+//        }
+//        Log.i("list size", list.size()+"");
+//        recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
 }
