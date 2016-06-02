@@ -17,4 +17,8 @@
     <string name="watch">Watch</string>
     <string name="future">Future</string>
     <string name="tag_name">名字</string>
+    <string name="goback">去意已决</string>
+    <string name="cancel_go_back">容我三思</string>
+    <string name="go_back_without_save">确认不保存么？</string>
+    <string name="choose_location">Choose Location</string>
 </resources>
