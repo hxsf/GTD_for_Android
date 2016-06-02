@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -34,13 +32,11 @@ public class LaunchActivity extends AppCompatActivity {
 
         AsyncTask asyncTask = new AsyncTask() {
             private Intent intent;
-            private Intent serverintent;
             public static final long LAUNCH_TIME = 1000;
 
             @Override
             protected void onPreExecute() {
                 intent = new Intent(LaunchActivity.this, MainActivity.class);
-                serverintent = new Intent(LaunchActivity.this, com.amap.api.location.APSService.class);
                 super.onPreExecute();
             }
             @Override
@@ -57,8 +53,6 @@ public class LaunchActivity extends AppCompatActivity {
                     while (!cango) {
                         Thread.sleep(LAUNCH_TIME);
                     }
-                    startService(serverintent);
-                    ((GTDApplication)getApplication()).mLocationClient.startLocation();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -97,33 +91,12 @@ public class LaunchActivity extends AppCompatActivity {
     private void init_permission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             List<String> permissions = new ArrayList<String>();
-            if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.INTERNET);
-            }
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-            if (checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.ACCESS_NETWORK_STATE);
-            }
             if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
             }
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
             }
-            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.READ_PHONE_STATE);
-            }
-            if (checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.CHANGE_WIFI_STATE);
-            }
-            if (checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.ACCESS_WIFI_STATE);
-            }
-//            if (checkSelfPermission(Manifest.permission.CHANGE_CONFIGURATION) != PackageManager.PERMISSION_GRANTED){
-//                permissions.add(Manifest.permission.CHANGE_CONFIGURATION);
-//            }
             if (permissions.size() > 0) {
                 cango = false;
                 mRequestObject = PermissionUtil.with(this).request(permissions.toArray(new String[permissions.size()]))

@@ -18,6 +18,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 dependencies {
@@ -29,6 +34,6 @@ dependencies {
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
     compile 'com.wdullaer:materialdatetimepicker:2.3.0'
     compile 'com.github.kayvannj:PermissionUtils:1.0.2@aar'
-    compile files('libs/AMap2DMap_2.9.0_AMapSearch_3.2.1_AMapLocation_2.4.1_20160525.jar')
     compile files('libs/AMap_Location_V2.5.0_20160526.jar')
+    compile files('libs/BaiduLBS_Android.jar')
 }
