@@ -112,36 +112,21 @@ public class MainActivity extends AppCompatActivity {
         }
         tagsDrawerItem = new PrimaryDrawerItem().withName("Tags").withIdentifier(0).withSubItems(tags_list).withIsExpanded(true).withSelectable(false);
 
-        return new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerResult)
-                .withTranslucentStatusBar(true)
-                .withActionBarDrawerToggle(true)
-                .withActionBarDrawerToggleAnimated(true)
-                .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Inbox").withIdentifier(1).withIcon(R.drawable.ic_menu_inbox),
-                        new PrimaryDrawerItem().withName("Next").withIdentifier(2).withIcon(R.drawable.ic_menu_next),
-                        new PrimaryDrawerItem().withName("Watch").withIdentifier(3).withIcon(R.drawable.ic_menu_watch),
-                        new PrimaryDrawerItem().withName("Futrue").withIdentifier(4).withIcon(R.drawable.ic_menu_future),
-                        tagsDrawerItem,
-                        new PrimaryDrawerItem().withName("Add New Tag").withIdentifier(10).withIcon(R.drawable.ic_add).withSelectable(false).withIconTintingEnabled(true).withIconColor(Color.parseColor("#000000"))
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        Log.i("Item", "postion="+position+" id="+drawerItem.getIdentifier());
-                        long id = drawerItem.getIdentifier();
+        Drawer.OnDrawerItemClickListener drawerItemClickHandle = new Drawer.OnDrawerItemClickListener() {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                Log.i("Item", "postion="+position+" id="+drawerItem.getIdentifier());
+                long id = drawerItem.getIdentifier();
 
-                        if (id == 10) {
-                            View dialogview = getLayoutInflater().inflate(R.layout.dialog_add_tag, null);
-                            final EditText tagname = (EditText) dialogview.findViewById(R.id.tag_name);
-                            final ColorPickerView colorPickerView = (ColorPickerView) dialogview.findViewById(R.id.color_picker_view);
-                            new AlertDialog.Builder(MainActivity.this)
-                                    .setTitle("Add A New Tag")
-                                    .setView(dialogview)
-                                    .setPositiveButton("Cancel", null)
-                                    .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                if (id == 10) {
+                    View dialogview = getLayoutInflater().inflate(R.layout.dialog_add_tag, null);
+                    final EditText tagname = (EditText) dialogview.findViewById(R.id.tag_name);
+                    final ColorPickerView colorPickerView = (ColorPickerView) dialogview.findViewById(R.id.color_picker_view);
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Add A New Tag")
+                            .setView(dialogview)
+                            .setPositiveButton("Cancel", null)
+                            .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     realm.beginTransaction();
@@ -172,25 +157,67 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                             }).show();
-                        }else {
-                            if (id == 1) {
-                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).findAll();
-                            } else if (id == 2) {
-                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).findAll();
-                            } else if (id == 3) {
-                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).findAll();
-                            } else if (id == 4) {
-                                list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).findAll();
-                            } else if (id > 10) {
-                                list = realm.where(Suff.class).equalTo("tags.id", id-10).findAll();
-                            }
-                            recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
-                        }
-
-
-                        return false;
+                }else {
+                    if (id == 1) {
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).findAll();
+                    } else if (id == 2) {
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).findAll();
+                    } else if (id == 3) {
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).findAll();
+                    } else if (id == 4) {
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).findAll();
+                    } else if (id > 10) {
+                        list = realm.where(Suff.class).equalTo("tags.id", id-10).findAll();
                     }
-                })
+                    recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
+                }
+                return true;
+            }
+        };
+        Drawer.OnDrawerItemLongClickListener drawerItemLongClickHandle = new Drawer.OnDrawerItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(View view, int position, final IDrawerItem drawerItem) {
+                final long id = drawerItem.getIdentifier();
+                if (id > 10) {
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Delete This Tag")
+                            .setNegativeButton("Cancel", null)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    realm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            realm.where(Tag.class).equalTo("id", id-10).findFirst().deleteFromRealm();
+                                        }
+                                    });
+                                    tagsDrawerItem.getSubItems().remove(drawerItem);
+                                    drawer.getAdapter().notifyAdapterSubItemsChanged(drawer.getPosition(0));
+                                }
+                            }).show();
+                    return true;
+                }
+                return false;
+            }
+        };
+        return new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(headerResult)
+                .withTranslucentStatusBar(true)
+                .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true)
+                .withScrollToTopAfterClick(true)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Inbox").withIdentifier(1).withIcon(R.drawable.ic_menu_inbox),
+                        new PrimaryDrawerItem().withName("Next").withIdentifier(2).withIcon(R.drawable.ic_menu_next),
+                        new PrimaryDrawerItem().withName("Watch").withIdentifier(3).withIcon(R.drawable.ic_menu_watch),
+                        new PrimaryDrawerItem().withName("Futrue").withIdentifier(4).withIcon(R.drawable.ic_menu_future),
+                        tagsDrawerItem,
+                        new PrimaryDrawerItem().withName("Add New Tag").withIdentifier(10).withIcon(R.drawable.ic_add).withSelectable(false).withIconTintingEnabled(true).withIconColor(Color.parseColor("#000000"))
+                )
+                .withOnDrawerItemClickListener(drawerItemClickHandle)
+                .withOnDrawerItemLongClickListener(drawerItemLongClickHandle)
                 .build();
     }
 
