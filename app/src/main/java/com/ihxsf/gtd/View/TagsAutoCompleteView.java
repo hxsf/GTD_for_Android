@@ -38,8 +38,6 @@ public class TagsAutoCompleteView extends TokenCompleteTextView<Tag> {
         LinearLayout view = (LinearLayout)l.inflate(R.layout.chips_tag, (ViewGroup)TagsAutoCompleteView.this.getParent(), false);
         TextView textView = (TextView)view.findViewById(R.id.chip_tag_name);
         textView.setText(object.getName());
-        GradientDrawable viewBackground = (GradientDrawable) view.getBackground();
-        viewBackground.setColor((int) object.getColor());
         ImageView imageView = (ImageView) view.findViewById(R.id.chip_tag_color);
         GradientDrawable imageViewBackground = (GradientDrawable) imageView.getBackground();
         imageViewBackground.setColor((int) object.getColor());

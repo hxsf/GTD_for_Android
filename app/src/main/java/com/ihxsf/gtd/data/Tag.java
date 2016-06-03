@@ -1,5 +1,7 @@
 package com.ihxsf.gtd.data;
 
+import java.io.Serializable;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -7,7 +9,7 @@ import io.realm.annotations.Required;
 /**
  * Created by hxsf on 16－06－01.
  */
-public class Tag extends RealmObject {
+public class Tag extends RealmObject implements Serializable {
     @PrimaryKey
     private int id;
     @Required
@@ -18,6 +20,7 @@ public class Tag extends RealmObject {
     public Tag() {
     }
     public Tag (Tag tag) {
+        this.id = tag.getId();
         this.name = tag.getName();
         this.color = tag.getColor();
     }
@@ -53,5 +56,17 @@ public class Tag extends RealmObject {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass() != Tag.class) {
+            return false;
+        }
+        if (id == ((Tag)o).getId()){
+            return true;
+        } else {
+            return false;
+        }
     }
 }

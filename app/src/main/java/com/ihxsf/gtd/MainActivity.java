@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     new AlertDialog.Builder(MainActivity.this)
                             .setTitle("Add A New Tag")
                             .setView(dialogview)
-                            .setPositiveButton("Cancel", null)
+                            .setNegativeButton("Cancel", null)
                             .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

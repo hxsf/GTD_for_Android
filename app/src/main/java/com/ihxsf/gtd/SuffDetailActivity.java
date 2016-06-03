@@ -2,37 +2,26 @@ package com.ihxsf.gtd;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
-import com.baidu.location.Poi;
 import com.baidu.mapapi.model.LatLng;
 import com.ihxsf.gtd.View.TagsAutoCompleteView;
 import com.ihxsf.gtd.data.Projects;
 import com.ihxsf.gtd.data.Suff;
 import com.ihxsf.gtd.data.Tag;
 import com.tokenautocomplete.FilteredArrayAdapter;
+import com.tokenautocomplete.TokenCompleteTextView;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog.*;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -61,13 +50,14 @@ public class SuffDetailActivity extends AppCompatActivity {
     private double lastLongitude;
     private int isedit = 0x00000000;
     private final int editTitle = 0x00000001;
-    private final int editDesc = 0x00000010;
-    private final int editTime = 0x00000100;
-    private final int editLoca = 0x00001000;
-    private final int editTags = 0x00010000;
+    private final int editProj = 0x00000010;
+    private final int editDesc = 0x00000100;
+    private final int editTime = 0x00001000;
+    private final int editLoca = 0x00010000;
+    private final int editTags = 0x00100000;
     Calendar time = Calendar.getInstance();
     private Suff suff;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
     private TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
@@ -96,6 +86,8 @@ public class SuffDetailActivity extends AppCompatActivity {
     private AlertDialog.Builder nullTitleDialog = null;
     private AlertDialog.Builder goBackDialog = null;
     private DatePickerDialog datePickerDialog = null;
+    private List<Tag> list;
+    private int tempProject;
 
     private void initDialog() {
         nullTitleDialog = new AlertDialog.Builder(SuffDetailActivity.this)
@@ -174,11 +166,32 @@ public class SuffDetailActivity extends AppCompatActivity {
         e_location = (EditText) findViewById(R.id.location_select);
         e_tags = (TagsAutoCompleteView) findViewById(R.id.tags);
 
+
+        e_project.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(SuffDetailActivity.this)
+                        .setTitle("Choose A Project")
+                        .setSingleChoiceItems(new String[]{"Inbox", "Next", "Watch", "Future"}, tempProject, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which != tempProject) {
+                                    tempProject = which;
+                                    isedit |= editProj;
+                                    e_project.setText(Projects.getValue(which+1).toString());
+                                }
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null).show();
+            }
+        });
+
         realm.beginTransaction();
         RealmResults<Tag> tags = realm.where(Tag.class).findAll();
         realm.commitTransaction();
 
-        List<Tag> list = new ArrayList<>();
+        list = new ArrayList<>();
         for (Tag tag : tags) {
             list.add(new Tag(tag));
         }
@@ -187,6 +200,28 @@ public class SuffDetailActivity extends AppCompatActivity {
             @Override
             protected boolean keepObject(Tag obj, String mask) {
                 return obj.getName().startsWith(mask);
+            }
+        });
+        final RealmList tag_list = suff.getTags()!=null ? suff.getTags() : new RealmList();
+        e_tags.setTokenListener(new TokenCompleteTextView.TokenListener<Tag>() {
+            @Override
+            public void onTokenAdded(Tag token) {
+                list.remove(token);
+                ((FilteredArrayAdapter)e_tags.getAdapter()).notifyDataSetChanged();
+                if (!tag_list.contains(realm.where(Tag.class).equalTo("id", token.getId()).findFirst())) {
+                    isedit |= editTags;
+                    Log.i("tags", "add");
+                }
+            }
+
+            @Override
+            public void onTokenRemoved(Tag token) {
+                list.add(token);
+                ((FilteredArrayAdapter)e_tags.getAdapter()).notifyDataSetChanged();
+                if (!tag_list.contains(token)) {
+                    isedit |= editTags;
+                    Log.i("tags", "remove");
+                }
             }
         });
 
@@ -210,14 +245,23 @@ public class SuffDetailActivity extends AppCompatActivity {
 
         e_title.setText(suff.getTitle());
         e_project.setText(Projects.getValue(suff.getProject()).toString());
+        tempProject = suff.getProject()-1;
         e_desc.setText(suff.getDesc());
         e_datetime.setText(suff.getTime()!=null?new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA).format(suff.getTime()):"");
         e_location.setText(suff.getEzLocation());
-        e_tags.setText(suff.getTags()!=null?suff.getTags().toString():"");
+        if (suff.getTags() != null) {
+            for (Tag tag : suff.getTags()) {
+                e_tags.addObject(new Tag(tag));
+            }
+        }
+
     }
     private boolean check_isedited () {
         if ((!e_title.getText().toString().equals(suff.getTitle()!=null?suff.getTitle():""))){
             isedit |= editTitle;
+        }
+        if (tempProject != suff.getProject()-1) {
+            isedit |= editProj;
         }
         if (!e_desc.getText().toString().equals(suff.getDesc()!=null?suff.getDesc():"")){
             isedit |= editDesc;
@@ -236,11 +280,25 @@ public class SuffDetailActivity extends AppCompatActivity {
             suff.setLocation(lastLatitude, lastLongitude);
             suff.setEzLocation(ezLocation);
         }
-        if((isedit & editTags) != 0) {
-
-        }
         if((isedit & editTime) != 0) {
             suff.setTime(time.getTime());
+        }
+        if((isedit & editProj) != 0) {
+            suff.setProject(tempProject+1);
+        }
+        if((isedit & editTags) != 0) {
+            RealmList<Tag> tags = suff.getTags();
+            if (tags == null){
+                this.suff = realm.copyToRealmOrUpdate(suff);
+                tags = this.suff.getTags();
+            } else {
+                tags.clear();
+            }
+            Log.i("get Tags", e_tags.getObjects().size()+"");
+            for (Tag tag : e_tags.getObjects()) {
+                Tag temp = realm.where(Tag.class).equalTo("id", tag.getId()).findFirst();
+                tags.add(temp);
+            }
         }
     }
 

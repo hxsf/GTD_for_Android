@@ -6,13 +6,17 @@
     android:layout_height="match_parent">
     <com.wrapp.floatlabelededittext.FloatLabeledEditText
         android:id="@+id/location_btn"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <EditText
             android:id="@+id/tag_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1"
             android:hint="@string/tag_name"/>
     </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
@@ -20,6 +24,8 @@
         android:id="@+id/color_picker_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         app:alphaSlider="true"
         app:density="12"
         app:lightnessSlider="true"
@@ -29,6 +35,8 @@
         />
 
     <com.flask.colorpicker.slider.LightnessSlider
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:id="@+id/v_lightness_slider"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -38,5 +46,7 @@
         android:id="@+id/v_alpha_slider"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         />
 </LinearLayout>

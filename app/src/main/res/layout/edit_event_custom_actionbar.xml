@@ -16,8 +16,8 @@
             style="@style/EditTextHeadline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
             android:hint="@string/title"
             android:inputType="textMultiLine"
             android:maxLines="2" />
@@ -36,8 +36,8 @@
             android:inputType="none"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
             android:hint="@string/project"
             android:text="Inbox"/>
 

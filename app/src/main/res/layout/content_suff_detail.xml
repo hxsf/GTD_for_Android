@@ -54,10 +54,9 @@
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:layout_width="match_parent"
-            android:paddingTop="16dp"
+            android:layout_marginTop="4dp"
             android:layout_height="wrap_content">
             <com.ihxsf.gtd.View.TagsAutoCompleteView
-                style="@style/EditTextHeadline"
                 android:id="@+id/tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
