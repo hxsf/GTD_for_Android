@@ -2,6 +2,7 @@ package com.ihxsf.gtd;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -26,19 +28,25 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
 import com.baidu.mapapi.model.LatLng;
+import com.ihxsf.gtd.View.TagsAutoCompleteView;
 import com.ihxsf.gtd.data.Projects;
 import com.ihxsf.gtd.data.Suff;
+import com.ihxsf.gtd.data.Tag;
+import com.tokenautocomplete.FilteredArrayAdapter;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog.*;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class SuffDetailActivity extends AppCompatActivity {
     private Realm realm;
@@ -47,7 +55,7 @@ public class SuffDetailActivity extends AppCompatActivity {
     EditText e_desc;
     EditText e_datetime;
     EditText e_location;
-    EditText e_tags;
+    TagsAutoCompleteView e_tags;
 
     private double lastLatitude;
     private double lastLongitude;
@@ -164,7 +172,23 @@ public class SuffDetailActivity extends AppCompatActivity {
         e_desc = (EditText) findViewById(R.id.desc_edit);
         e_datetime = (EditText) findViewById(R.id.date_select);
         e_location = (EditText) findViewById(R.id.location_select);
-        e_tags = (EditText) findViewById(R.id.tags);
+        e_tags = (TagsAutoCompleteView) findViewById(R.id.tags);
+
+        realm.beginTransaction();
+        RealmResults<Tag> tags = realm.where(Tag.class).findAll();
+        realm.commitTransaction();
+
+        List<Tag> list = new ArrayList<>();
+        for (Tag tag : tags) {
+            list.add(new Tag(tag));
+        }
+
+        e_tags.setAdapter(new FilteredArrayAdapter<Tag>(this, android.R.layout.simple_list_item_1, list) {
+            @Override
+            protected boolean keepObject(Tag obj, String mask) {
+                return obj.getName().startsWith(mask);
+            }
+        });
 
         if(suff.getTime() !=null){
             time.setTime(suff.getTime());

@@ -15,6 +15,17 @@ public class Tag extends RealmObject {
     @Required
     private Long color;
 
+    public Tag() {
+    }
+    public Tag (Tag tag) {
+        this.name = tag.getName();
+        this.color = tag.getColor();
+    }
+    public Tag(String name, Long color) {
+        this.name = name;
+        this.color = color;
+    }
+
     public long getColor() {
         return color;
     }
@@ -37,5 +48,10 @@ public class Tag extends RealmObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
