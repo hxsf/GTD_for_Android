@@ -21,4 +21,6 @@
     <string name="cancel_go_back">容我三思</string>
     <string name="go_back_without_save">确认不保存么？</string>
     <string name="choose_location">Choose Location</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

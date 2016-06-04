@@ -20,9 +20,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- SD卡读取权限，用户写入离线定位数据 -->
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
@@ -61,11 +60,32 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChooseLocationActivity"></activity>
+        <activity android:name=".ChooseLocationActivity" />
+
+        <receiver android:name=".SuffListWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+                <!-- 接收点击listview的响应事件 -->
+                <action android:name="com.ihxsf.gtd.event.COLLECTION_VIEW_ACTION" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/suff_list_widget_info" />
+        </receiver>
+
+        <service
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:name=".WidgetService"
+            android:enabled="true"
+            android:exported="false"/>
     </application>
 
 </manifest>

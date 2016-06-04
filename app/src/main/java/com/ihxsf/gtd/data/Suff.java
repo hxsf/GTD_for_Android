@@ -2,10 +2,13 @@ package com.ihxsf.gtd.data;
 
 import android.location.Location;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -54,6 +57,21 @@ public class Suff extends RealmObject {
 
     public Suff() {
         isDone= false;
+    }
+
+    public Suff(Suff suff) {
+        this.id = suff.getId();
+        this.title = suff.getTitle();
+        this.time = suff.getTime();
+        this.latitude = suff.getLatitude();
+        this.longitude = suff.longitude;
+        this.level = suff.getLevel();
+        this.project = suff.getProject();
+        this.isDone = suff.isDone();
+        this.desc = suff.getDesc();
+        this.ezLocation = suff.getEzLocation();
+        this.tags = suff.getTags();
+        this.rank = suff.getRank();
     }
 
     public int getId() {
@@ -153,5 +171,13 @@ public class Suff extends RealmObject {
 
     public void setDone(boolean done) {
         isDone = done;
+    }
+
+    public static List<Suff> clone(RealmResults<Suff> suffs) {
+        List<Suff> list = new ArrayList<>();
+        for (Suff suff : suffs) {
+            list.add(new Suff(suff));
+        }
+        return list;
     }
 }
