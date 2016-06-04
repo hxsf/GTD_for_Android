@@ -5,6 +5,8 @@ import android.location.Location;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
+import com.facebook.stetho.Stetho;
+import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import java.util.Date;
 
@@ -26,6 +28,11 @@ public class GTDApplication extends Application {
         RealmConfiguration config = new RealmConfiguration.Builder(this).build();
         Realm.setDefaultConfiguration(config);
         Log.i("realm", "set default");
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+                        .build());
     }
 
 

@@ -8,4 +8,6 @@
     <color name="backgroud">#abcdef</color>
     <color name="gray">#ccc</color>
     <color name="white">#fff</color>
+    <color name="colorDone">#00ffff</color>
+    <color name="colorSchedule">#ffff00</color>
 </resources>

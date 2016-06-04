@@ -1,15 +1,10 @@
 package com.ihxsf.gtd;
 
-import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -18,10 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -29,9 +22,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.slider.LightnessSlider;
 import com.ihxsf.gtd.View.SuffDividerItemDecoration;
-import com.ihxsf.gtd.View.SuffDividerLine;
 import com.ihxsf.gtd.View.SuffItemTouchHelper;
 import com.ihxsf.gtd.View.SuffListAdapter;
 import com.ihxsf.gtd.data.Projects;
@@ -41,17 +32,18 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.BaseViewHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity {
     private Realm realm;
@@ -160,16 +152,25 @@ public class MainActivity extends AppCompatActivity {
                             }).show();
                 }else {
                     if (id == 1) {
-                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).findAll();
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).equalTo("isDone", false).findAll();
                     } else if (id == 2) {
-                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).findAll();
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).equalTo("isDone", false).findAll();
                     } else if (id == 3) {
-                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).findAll();
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).equalTo("isDone", false).findAll();
                     } else if (id == 4) {
-                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).findAll();
+                        list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).equalTo("isDone", false).findAll();
+                    } else if (id == 5) {
+                        list = realm.where(Suff.class).equalTo("isDone", true).findAll();
                     } else if (id > 10) {
-                        list = realm.where(Suff.class).equalTo("tags.id", id-10).findAll();
+                        list = realm.where(Suff.class).equalTo("tags.id", id-10).equalTo("isDone", false).findAll();
                     }
+                    for (Suff suff : list) {
+                        realm.beginTransaction();
+                        suff.calcRank(null);
+                        realm.commitTransaction();
+                    }
+                    list = list.sort("rank");
+
                     recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
                 }
                 return true;
@@ -215,7 +216,8 @@ public class MainActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName("Watch").withIdentifier(3).withIcon(R.drawable.ic_menu_watch),
                         new PrimaryDrawerItem().withName("Futrue").withIdentifier(4).withIcon(R.drawable.ic_menu_future),
                         tagsDrawerItem,
-                        new PrimaryDrawerItem().withName("Add New Tag").withIdentifier(10).withIcon(R.drawable.ic_add).withSelectable(false).withIconTintingEnabled(true).withIconColor(Color.parseColor("#000000"))
+                        new PrimaryDrawerItem().withName("Add New Tag").withIdentifier(10).withIcon(R.drawable.ic_add).withSelectable(false).withIconTintingEnabled(true).withIconColor(Color.parseColor("#000000")),
+                        new PrimaryDrawerItem().withName("Already Done").withIdentifier(5).withIcon(R.drawable.ic_archive_black_24dp)
                 )
                 .withOnDrawerItemClickListener(drawerItemClickHandle)
                 .withOnDrawerItemLongClickListener(drawerItemLongClickHandle)
@@ -237,6 +239,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -279,7 +291,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        list = realm.where(Suff.class).findAllAsync();
+        list = realm.where(Suff.class).equalTo("isDone", false).findAll();
+        for (Suff suff : list) {
+            realm.beginTransaction();
+            suff.calcRank(null);
+            realm.commitTransaction();
+        }
+        list = list.sort("rank", Sort.DESCENDING);
         SuffListAdapter adapter = new SuffListAdapter(this, list);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
@@ -296,42 +314,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm) {
                 realm.where(Suff.class).equalTo("id", id)
-                        .findFirst()
-                        .deleteFromRealm();
+                        .findFirst().setDone(true);
             }
         });
     }
     public void deleteItem(int postion) {
         realm.beginTransaction();
-        list.deleteFromRealm(postion);
+        list.get(postion).setDone(true);
         realm.commitTransaction();
     }
-//
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Inbox)).findAll();
-//        } else if (id == R.id.nav_gallery) {
-//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Next)).findAll();
-//        } else if (id == R.id.nav_slideshow) {
-//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Watch)).findAll();
-//        } else if (id == R.id.nav_manage) {
-//            list = realm.where(Suff.class).equalTo("project", Projects.getPostion(Projects.Future)).findAll();
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//        Log.i("list size", list.size()+"");
-//        recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
+
+    public void doneRollback(int id) {
+        realm.beginTransaction();
+        realm.where(Suff.class).equalTo("id", id).findFirst().setDone(false);
+        realm.commitTransaction();
+    }
+
+    public int changeItemTime(int postion, Date time) {
+        realm.beginTransaction();
+        Suff temp = list.get(postion);
+        temp.setTime(time);
+        reflashList();
+        int newpostion = list.indexOf(temp);
+        realm.commitTransaction();
+        return newpostion;
+    }
+    public void reflashList() {
+        for (Suff suff : list) {
+            suff.calcRank(null);
+        }
+        list = list.sort("rank", Sort.DESCENDING);
+    }
 }

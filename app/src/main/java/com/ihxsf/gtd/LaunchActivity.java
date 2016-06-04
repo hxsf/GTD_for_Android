@@ -88,7 +88,7 @@ public class LaunchActivity extends AppCompatActivity {
         suff0.setTitle("Top TODO");
         suff0.setId(1);
         suff0.setProject(1);
-        suff0.setTime(new Date(System.currentTimeMillis()-1000));
+        suff0.setTime(new Date(System.currentTimeMillis()+1000000));
         suff0 = realm.copyToRealmOrUpdate(suff0);
         suff0.getTags().add(tag1);
         suff0.getTags().add(tag2);
@@ -98,7 +98,7 @@ public class LaunchActivity extends AppCompatActivity {
         suff1.setTitle("1st TODO");
         suff1.setId(2);
         suff1.setProject(1);
-        suff1.setTime(new Date(System.currentTimeMillis()-1000));
+        suff1.setTime(new Date(System.currentTimeMillis()+50000000));
         suff1 = realm.copyToRealmOrUpdate(suff1);
         suff1.getTags().add(tag1);
         suff1 = realm.copyToRealmOrUpdate(suff1);
@@ -107,7 +107,7 @@ public class LaunchActivity extends AppCompatActivity {
         suff2.setTitle("2nd TODO");
         suff2.setId(3);
         suff2.setProject(2);
-        suff2.setTime(new Date(System.currentTimeMillis()));
+        suff2.setTime(new Date(System.currentTimeMillis()+20000000));
         suff2 = realm.copyToRealmOrUpdate(suff2);
         suff2.getTags().add(tag2);
         suff2 = realm.copyToRealmOrUpdate(suff2);

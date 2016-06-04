@@ -149,7 +149,8 @@ public class SuffDetailActivity extends AppCompatActivity {
         } else {
             suff = new Suff();
             realm.beginTransaction();
-            suff.setId(realm.where(Suff.class).max("id").intValue()+1);
+            Number maxid = realm.where(Suff.class).max("id");
+            suff.setId((maxid!=null?maxid.intValue():0)+1);
             if (action != null && type != null && action.equals(Intent.ACTION_SEND) && "text/plain".equals(type)){
                 isedit |= editTitle;
                 suff.setTitle(intent.getStringExtra(Intent.EXTRA_TEXT));
@@ -293,6 +294,7 @@ public class SuffDetailActivity extends AppCompatActivity {
         }
         if((isedit & editTime) != 0) {
             suff.setTime(time.getTime());
+            suff.calcRank(null);
         }
         if((isedit & editProj) != 0) {
             suff.setProject(tempProject+1);

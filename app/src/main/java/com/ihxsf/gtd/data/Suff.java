@@ -27,10 +27,10 @@ public class Suff extends RealmObject {
     private Double longitude;
     private int level;
     private int project;
+    private boolean isDone;
     private String desc;
     private String ezLocation;
     private RealmList<Tag> tags;
-    @Ignore
     private long rank;
 
     public Double getLatitude() {
@@ -41,8 +41,8 @@ public class Suff extends RealmObject {
         return longitude;
     }
     public void setLocation(Double latitude, Double longitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
+        this.setLongitude(longitude);
+        this.setLatitude(latitude);
     }
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
@@ -53,6 +53,7 @@ public class Suff extends RealmObject {
     }
 
     public Suff() {
+        isDone= false;
     }
 
     public int getId() {
@@ -64,10 +65,21 @@ public class Suff extends RealmObject {
     }
 
     private long calcLocale(Location l) {
-        return (long) sqrt(pow(l.getLatitude() - latitude, 2) + pow(l.getLongitude() - longitude, 2)) * 10;
+        return (long) sqrt(pow(l.getLatitude() - getLatitude(), 2) + pow(l.getLongitude() - getLongitude(), 2)) * 1000;
     }
     public long calcRank(Location l) {
-        rank = ((System.currentTimeMillis() - time.getTime()) / 1000 + calcLocale(l)) / level;
+        long rank = 0;
+        if (getTime() != null) {
+            rank += (System.currentTimeMillis() - getTime().getTime()) / 1000;
+        }
+        if (getLongitude() != null && l != null) {
+            rank += calcLocale(l);
+        }
+        if (getLevel() ==0) {
+            setLevel(1);
+        }
+        rank /= getLevel();
+        this.setRank(rank);
         return rank;
     }
 
@@ -133,5 +145,13 @@ public class Suff extends RealmObject {
 
     public void setRank(long rank) {
         this.rank = rank;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
     }
 }
