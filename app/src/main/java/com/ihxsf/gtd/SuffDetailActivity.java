@@ -134,7 +134,13 @@ public class SuffDetailActivity extends AppCompatActivity {
         });
         realm = Realm.getDefaultInstance();
 
-        int id = getIntent().getIntExtra("id", 0);
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        int id = intent.getIntExtra("id", 0);
+
 
         if (id > 0) {
             realm.beginTransaction();
@@ -144,9 +150,14 @@ public class SuffDetailActivity extends AppCompatActivity {
             suff = new Suff();
             realm.beginTransaction();
             suff.setId(realm.where(Suff.class).max("id").intValue()+1);
+            if (action != null && type != null && action.equals(Intent.ACTION_SEND) && "text/plain".equals(type)){
+                isedit |= editTitle;
+                suff.setTitle(intent.getStringExtra(Intent.EXTRA_TEXT));
+            }
             realm.commitTransaction();
             suff.setProject(Projects.getPostion(Projects.Inbox));
         }
+
         init_values(suff);
         initDialog();
     }

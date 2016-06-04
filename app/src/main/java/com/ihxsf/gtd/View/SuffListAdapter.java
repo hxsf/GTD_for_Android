@@ -45,6 +45,7 @@ public class SuffListAdapter extends RealmRecyclerViewAdapter<Suff, SuffListAdap
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(activity, SuffDetailActivity.class);
+                intent.putExtra("type", 1);//modif
                 intent.putExtra("id", obj.getId());
                 activity.startActivity(intent);
             }
