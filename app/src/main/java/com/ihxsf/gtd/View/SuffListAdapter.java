@@ -2,6 +2,8 @@ package com.ihxsf.gtd.View;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +20,8 @@ import com.ihxsf.gtd.data.Suff;
 import com.ihxsf.gtd.util.DateCalc;
 
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;

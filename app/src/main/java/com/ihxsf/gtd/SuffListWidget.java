@@ -41,7 +41,7 @@ public class SuffListWidget extends AppWidgetProvider {
         //don't know its purpose to me right now
         svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
         //setting adapter to listview of the widget
-        remoteViews.setRemoteAdapter(appWidgetId, R.id.widget_list, svcIntent);
+        remoteViews.setRemoteAdapter(R.id.widget_list, svcIntent);
         Intent intent = new Intent(context, SuffDetailActivity.class);
         intent.putExtra("type", 0);//new suff
         intent.putExtra("id", 0);

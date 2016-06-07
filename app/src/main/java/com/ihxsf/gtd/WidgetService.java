@@ -62,7 +62,7 @@ public class WidgetService extends RemoteViewsService {
         @Override
         public RemoteViews getViewAt(int position) {
             final RemoteViews remoteView = new RemoteViews(
-                    context.getPackageName(), R.layout.suff_item);
+                    context.getPackageName(), R.layout.suff_item_main);
             Suff suff = widgetItems.get(position);
             remoteView.setTextViewText(R.id.item_title, suff.getTitle());
             remoteView.setTextViewText(R.id.item_time, DateCalc.fromToday(suff.getTime()));

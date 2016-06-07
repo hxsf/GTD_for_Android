@@ -6,6 +6,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,6 +41,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
@@ -52,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
     private Drawer drawer;
     private Toolbar toolbar;
     private PrimaryDrawerItem tagsDrawerItem;
+
+    private Handler handler;
+    private Timer timer;
+    private SuffListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,11 +252,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == 999) {
+                    adapter.notifyDataSetChanged();
+                } else {
+                    super.handleMessage(msg);
+                }
+            }
+        };
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Message updateTime = new Message();
+                updateTime.what = 999;
+                handler.sendMessage(updateTime);
+            }
+        }, 60000, 60000);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        timer.cancel();
     }
 
     @Override
@@ -298,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
             realm.commitTransaction();
         }
         list = list.sort("rank", Sort.DESCENDING);
-        SuffListAdapter adapter = new SuffListAdapter(this, list);
+        adapter = new SuffListAdapter(this, list);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new SuffDividerItemDecoration(this, SuffDividerItemDecoration.VERTICAL_LIST));

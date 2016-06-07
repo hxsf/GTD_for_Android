@@ -54,7 +54,7 @@ public class LaunchActivity extends AppCompatActivity {
             protected Object doInBackground(Object[] params) {
                 try {
                     init_permission();
-                    insert_test_data();
+//                    insert_test_data();
                     while (!cango) {
                         Thread.sleep(LAUNCH_TIME);
                     }

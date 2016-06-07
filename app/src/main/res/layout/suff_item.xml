@@ -22,34 +22,5 @@
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_schedule_black_24dp"/>
-    <LinearLayout
-        android:id="@+id/suff_item"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/suff_heigth_small"
-        android:background="@android:color/white"
-        android:padding="5dp"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/item_title"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:textSize="28sp"
-            android:text="Title"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/item_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2015-10-12 12:23"/>
-            <TextView
-                android:id="@+id/item_location"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:textAlignment="textEnd"
-                android:layout_height="wrap_content"
-                android:text="China, shanghai"/>
-        </LinearLayout>
-    </LinearLayout>
+    <include layout="@layout/suff_item_main" />
 </RelativeLayout>
