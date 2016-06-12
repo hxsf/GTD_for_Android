@@ -72,8 +72,8 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 
-                <!-- 接收点击listview的响应事件 -->
-                <action android:name="com.ihxsf.gtd.event.COLLECTION_VIEW_ACTION" />
+                <!-- 接收listview的更新事件 -->
+                <action android:name="com.ihxsf.gtd.event.UPDATE_DATA" />
             </intent-filter>
 
             <meta-data

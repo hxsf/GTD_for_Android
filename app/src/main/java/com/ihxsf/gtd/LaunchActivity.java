@@ -9,6 +9,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.github.kayvannj.permission_utils.Func;
 import com.github.kayvannj.permission_utils.PermissionUtil;
@@ -26,8 +27,6 @@ public class LaunchActivity extends AppCompatActivity {
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
     private PermissionUtil.PermissionRequestObject mRequestObject;
 
-    private List<String> permissions = new ArrayList<String>();
-    private int permission_num = 0;
     private boolean cango = true;
 
     @Override
@@ -47,11 +46,13 @@ public class LaunchActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
+                Log.i("permission", "onPostExecute");
                 startActivity(intent);
                 finish();
             }
             @Override
             protected Object doInBackground(Object[] params) {
+                Log.i("permission", "doInBackground-start");
                 try {
                     init_permission();
 //                    insert_test_data();
@@ -61,6 +62,7 @@ public class LaunchActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                Log.i("permission", "doInBackground-end");
                 return null;
             }
         };
@@ -119,14 +121,29 @@ public class LaunchActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        permission_num--;
-        if (permission_num == 0){
-            cango = true;
+        if (requestCode == REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS) {
+            List<String> newPermissions = new ArrayList<>();
+            for (int i = 0; i < permissions.length; ++i){
+                if (grantResults[i] != 0){
+                    newPermissions.add(permissions[i]);
+                }
+            }
+            if (newPermissions.size() == 0){
+                cango = true;
+            } else {
+                request_permission(newPermissions.toArray(new String[newPermissions.size()]));
+            }
         }
     }
 
+    private void request_permission(String[] permissions) {
+        mRequestObject = PermissionUtil.with(this).request(permissions).ask(REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+    }
+
+
     private void init_permission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            List<String> permissions = new ArrayList<String>();
             if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
             }
@@ -148,24 +165,9 @@ public class LaunchActivity extends AppCompatActivity {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
-//            if (checkSelfPermission(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS) != PackageManager.PERMISSION_GRANTED){
-//                permissions.add(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);
-//            }
-            permission_num = permissions.size();
-            if (permission_num > 0) {
+            if (permissions.size() > 0) {
                 cango = false;
-                mRequestObject = PermissionUtil.with(this).request(permissions.toArray(new String[permissions.size()]))
-                        .onAllGranted(new Func() {
-                            @Override
-                            protected void call() {
-                                cango = true;
-                            }
-                        }).onAnyDenied(new Func() {
-                            @Override
-                            protected void call() {
-                                cango = true;
-                            }
-                        }).ask(REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                request_permission(permissions.toArray(new String[permissions.size()]));
             } else {
                 cango = true;
             }

@@ -222,7 +222,7 @@ public class SuffDetailActivity extends AppCompatActivity {
                 ((FilteredArrayAdapter)e_tags.getAdapter()).notifyDataSetChanged();
                 if (!tag_list.contains(realm.where(Tag.class).equalTo("id", token.getId()).findFirst())) {
                     isedit |= editTags;
-                    Log.i("tags", "add");
+//                    Log.i("tags", "add");
                 }
             }
 
@@ -232,7 +232,7 @@ public class SuffDetailActivity extends AppCompatActivity {
                 ((FilteredArrayAdapter)e_tags.getAdapter()).notifyDataSetChanged();
                 if (!tag_list.contains(token)) {
                     isedit |= editTags;
-                    Log.i("tags", "remove");
+//                    Log.i("tags", "remove");
                 }
             }
         });
@@ -307,11 +307,14 @@ public class SuffDetailActivity extends AppCompatActivity {
             } else {
                 tags.clear();
             }
-            Log.i("get Tags", e_tags.getObjects().size()+"");
+//            Log.i("get Tags", e_tags.getObjects().size()+"");
             for (Tag tag : e_tags.getObjects()) {
                 Tag temp = realm.where(Tag.class).equalTo("id", tag.getId()).findFirst();
                 tags.add(temp);
             }
+        }
+        if (isedit !=0 ) {
+            sendBroadcast(new Intent("com.ihxsf.gtd.event.UPDATE_DATA"));
         }
     }
 

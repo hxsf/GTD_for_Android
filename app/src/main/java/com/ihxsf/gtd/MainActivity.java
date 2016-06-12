@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         Drawer.OnDrawerItemClickListener drawerItemClickHandle = new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                Log.i("Item", "postion="+position+" id="+drawerItem.getIdentifier());
+//                Log.i("Item", "postion="+position+" id="+drawerItem.getIdentifier());
                 long id = drawerItem.getIdentifier();
 
                 if (id == 10) {

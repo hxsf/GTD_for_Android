@@ -15,6 +15,8 @@ import android.widget.RemoteViews;
  */
 public class SuffListWidget extends AppWidgetProvider {
 
+    private int[] appWidgetIds = null;
+
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
@@ -63,6 +65,7 @@ public class SuffListWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
+        this.appWidgetIds = appWidgetIds;
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
@@ -81,8 +84,13 @@ public class SuffListWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        if (intent.getAction().equals("com.ihxsf.gtd.event.COLLECTION_VIEW_ACTION")) {
-            Log.i("list_item_click", intent.getIntExtra("id", -1)+"");
+        if (intent.getAction().equals("com.ihxsf.gtd.event.UPDATE_DATA")) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            //getComponentName
+            ComponentName thisWidget = new ComponentName(context, SuffListWidget.class);
+            //get the IDs for all the instances of this widget
+            int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+            this.onUpdate(context, appWidgetManager, allWidgetIds);
         }
     }
 }

@@ -116,7 +116,7 @@ public class ChooseLocationActivity extends AppCompatActivity {
                     sb.append(p.getId()).append(" ").append(p.getName()).append(" ").append(p.getRank());
                 }
             }
-            Log.i("BaiduLocationApiDem", sb.toString());
+//            Log.i("BaiduLocationApiDem", sb.toString());
 
             init_map();
         }

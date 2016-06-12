@@ -66,7 +66,7 @@ public class SuffItemTouchHelper extends ItemTouchHelper.Callback {
         final Suff suff = ((SuffListAdapter.MyViewHolder)viewHolder).data;
         final int id = suff.getId();
         final int postion = viewHolder.getAdapterPosition();
-        Log.i("swiped", "onSwiped: "+direction+" right= "+ItemTouchHelper.RIGHT);
+//        Log.i("swiped", "onSwiped: "+direction+" right= "+ItemTouchHelper.RIGHT);
         String text;
         // 判断方向，进行不同的操作
         if (direction == ItemTouchHelper.END || direction == ItemTouchHelper.RIGHT) {

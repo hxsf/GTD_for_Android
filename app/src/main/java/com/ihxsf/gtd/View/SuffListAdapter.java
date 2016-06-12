@@ -78,18 +78,21 @@ public class SuffListAdapter extends RealmRecyclerViewAdapter<Suff, SuffListAdap
     @Override
     public void onItemDismiss(int position) {
         activity.deleteItem(position);
+        context.sendBroadcast(new Intent("com.ihxsf.gtd.event.UPDATE_DATA"));
         notifyItemRemoved(position);
     }
 
     public void onItemRollback(int id, int position) {
         activity.doneRollback(id);
+        context.sendBroadcast(new Intent("com.ihxsf.gtd.event.UPDATE_DATA"));
         notifyItemInserted(position);
     }
 
     public void changeItemTime(int position, Date time) {
         int newpostion = activity.changeItemTime(position, time);
         notifyItemChanged(position);
-        Log.i("move", "from: "+position+" to: "+newpostion);
+        context.sendBroadcast(new Intent("com.ihxsf.gtd.event.UPDATE_DATA"));
+//        Log.i("move", "from: "+position+" to: "+newpostion);
         notifyItemMoved(position, newpostion);
     }
 
