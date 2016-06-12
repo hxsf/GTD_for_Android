@@ -1,24 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroud">
+    android:background="#2d2d2d"
+    android:orientation="vertical"
+    >
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"/>
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/side_nav_bar"/>
+        android:layout_gravity="center"
+        android:layout_height="40dp"
+        android:layout_weight="3"
+        android:src="@mipmap/ic_launcher"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingTop="24dp"
+        android:layout_weight="4"
         android:layout_gravity="center"
         android:orientation="vertical">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"/>
+            android:textSize="28sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/white"
+            android:text="I Do..."/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"/>
+            android:textSize="28sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/white"
+            android:text="Just To Do..."/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/white"
+            android:text="Get Things Done"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/white"
+            android:text="Do Not Delay"/>
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>

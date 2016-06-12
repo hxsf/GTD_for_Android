@@ -35,6 +35,7 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
@@ -93,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withCompactStyle(false)
-                .withHeaderBackground(R.drawable.side_nav_bar)
+                .withHeaderBackground(R.mipmap.header)
+                .addProfiles(new ProfileDrawerItem().withName("I DO...").withEmail("Get Things Done").withIcon(R.mipmap.ic_launcher).withEnabled(false).withIsExpanded(false))
                 .withSavedInstance(savedInstanceState)
                 .build();
         realm.beginTransaction();
@@ -180,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
                     list = list.sort("rank");
 
                     recyclerView.setAdapter(new SuffListAdapter(MainActivity.this, list));
+
+                    drawer.closeDrawer();
                 }
                 return true;
             }
