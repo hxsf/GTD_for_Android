@@ -1,9 +1,11 @@
 package com.ihxsf.gtd;
 
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -12,6 +14,8 @@ import com.ihxsf.gtd.util.DateCalc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.realm.Realm;
 
@@ -26,6 +30,15 @@ public class WidgetService extends RemoteViewsService {
         private Context context;
         private int widgetid;
         private Realm realm;
+        private final BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(Intent.ACTION_TIME_TICK)) {
+                    context.sendBroadcast(new Intent("com.ihxsf.gtd.event.UPDATE_DATA"));
+                }
+            }
+        };
 
         public ListRemoteViewsFactory(Context applicationContext, Intent intent) {
             context = applicationContext;
@@ -39,6 +52,10 @@ public class WidgetService extends RemoteViewsService {
             widgetItems = Suff.clone(realm.where(Suff.class).equalTo("isDone", false).findAll());
             realm.close();
             realm = null;
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_TIME_TICK);
+            context.registerReceiver(receiver, filter);
         }
 
         @Override

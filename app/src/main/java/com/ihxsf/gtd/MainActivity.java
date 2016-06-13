@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        testPermission();
         realm = Realm.getDefaultInstance();
         recyclerView = (RecyclerView) findViewById(R.id.suff_list);
         setUpRecyclerView();
@@ -274,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                 updateTime.what = 999;
                 handler.sendMessage(updateTime);
             }
-        }, 60000, 60000);
+        }, 61000 - (System.currentTimeMillis() % 60000), 60000);
     }
 
     @Override

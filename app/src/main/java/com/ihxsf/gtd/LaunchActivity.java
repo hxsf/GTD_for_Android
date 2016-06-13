@@ -56,9 +56,9 @@ public class LaunchActivity extends AppCompatActivity {
                 try {
                     init_permission();
 //                    insert_test_data();
-                    while (!cango) {
+                    do {
                         Thread.sleep(LAUNCH_TIME);
-                    }
+                    }while (!cango);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
